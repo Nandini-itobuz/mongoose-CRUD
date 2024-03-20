@@ -1,17 +1,17 @@
-import express from 'express';
-import mongoose from 'mongoose';
-import  {dataRoutes } from './Routes/RouteControllers.js';
-
-
-mongoose.connect('mongodb://localhost:27017');
-
+import express from "express";
+import { dataRoutes } from "./Routes/RouteControllers.js";
+import {connectDb} from './Connect.js';
+import dotenv from 'dotenv';
+dotenv.config();
+const PORT = process.env.PORT;
 
 const app = express();
-app.use(express.json())
+app.use(express.json());
 app.use(dataRoutes);
 
-const port = 9000;
+connectDb().then(() => {
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+});
 
-app.listen(port,()=>{
-    console.log("Listing to server...")
-})

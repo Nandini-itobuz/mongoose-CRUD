@@ -1,62 +1,67 @@
 import personModel from "../schema.js";
 
-async function run(nameUser, emailUser, passwordUser) {
+export async function updateData(req, res) {
   try {
+    const { name, email, password } = req.body;
+    const user = await personModel.findByIdAndUpdate(
+      { _id: req.params["id"] },
+      { name: name, email: email, password: password },
+      { new: true }
+    );
+    res.status(200).json({
+      data: updatedUser,
+      message: "Data Successfully updated!",
+      status: 200,
+    });
+  } catch (e) {
+    console.log("Unable to update!");
+  }
+}
+
+export async function findData(req, res) {
+  try {
+    const findUser = await personModel.findById(req.params["id"]);
+    if (!findUser) {
+      res.status(404).send({
+        data: findUser,
+        message: "Data not found!",
+        status: 404,
+      });
+    }
+    res.status(200).send({
+      data: findUser,
+      message: "Data Successfully found!",
+      status: 200,
+    });
+  } catch (e) {
+    console.log("Data not found");
+  }
+}
+
+export async function insertData(req, res) {
+  try {
+    const nameUser = req.body.name;
+    const emailUser = req.body.email;
+    const passwordUser = req.body.password;
+    console.log(nameUser);
+
+    if (!nameUser || !emailUser || !passwordUser) {
+      res.status(404).json({
+        data: null,
+        message: "Unable to insert data",
+        status: 404,
+      });
+    }
     const user = await personModel.create({
       name: nameUser,
       email: emailUser,
       password: passwordUser,
     });
+    res.status(404).json({
+      message: "Data inserted succesfully",
+      status: 200,
+    });
   } catch (e) {
-    console.log(e.message);
+    console.log("error in inserting data");
   }
-}
-
-async function find(idUser) {
-  try {
-    return await personModel.findById(idUser);
-  } catch (e) {
-    console.log(e.message);
-  }
-}
-
-async function update( idUser,objUser) {
-  try {
-    const{name,email,password} = objUser
-    const user = await personModel.findByIdAndUpdate(
-      { _id: idUser },
-      { name: name, email:email, password:password }
-    );
-    return user;
-  } catch (e) {
-    console.log(e.message);
-  }
-}
-
-
-export async function updateData(req, res) {
-  const updatedUser = await update(req.params["id"], req.body);
-  res.status(200).json({
-    data: updatedUser,
-    message: "Data Successfully updated!",
-    status: 200,
-  });
-}
-
-export async function findData(req, res) {
-  const findUser = await find(req.params["id"]);
-  res.status(200).json({
-    data: findUser,
-    message: "Data Successfully found!",
-    status: 200,
-  });
-}
-
-export function insertData(req, res) {
-  run(req.body.name, req.body.email, req.body.password);
-  res.status(200).json({
-    data: req.body,
-    message: "Data Successfully added!",
-    status: 200,
-  });
 }
