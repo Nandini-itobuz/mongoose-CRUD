@@ -1,5 +1,4 @@
-
-import personModel from '../schema.js';
+import personModel from "../schema.js";
 
 async function run(nameUser, emailUser, passwordUser) {
   try {
@@ -21,11 +20,12 @@ async function find(idUser) {
   }
 }
 
-async function update(objUser, idUser) {
+async function update( idUser,objUser) {
   try {
-    const user = await personModel.findOneAndUpdate(
+    const{name,email,password} = objUser
+    const user = await personModel.findByIdAndUpdate(
       { _id: idUser },
-      { name: objUser }
+      { name: name, email:email, password:password }
     );
     return user;
   } catch (e) {
@@ -33,8 +33,9 @@ async function update(objUser, idUser) {
   }
 }
 
+
 export async function updateData(req, res) {
-  const updatedUser = await update(req.body.name, req.params["id"]);
+  const updatedUser = await update(req.params["id"], req.body);
   res.status(200).json({
     data: updatedUser,
     message: "Data Successfully updated!",
